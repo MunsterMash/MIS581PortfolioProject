@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[88]:
 
 
 import pandas as pd
@@ -19,14 +19,14 @@ medical = pd.read_csv('healthcare-dataset-stroke-data.csv')
 medical.head()
 
 
-# In[ ]:
+# In[89]:
 
 
 # medical['ever_married'].value_counts()
 medical['ever_married'] = medical['ever_married'].map({'Yes':1,'No':0})
 
 
-# In[ ]:
+# In[90]:
 
 
 le = LabelEncoder()
@@ -37,43 +37,64 @@ medical['smoking_status'] = le.fit_transform(medical['smoking_status'])
 medical.fillna(0)
 
 
-# In[ ]:
+# In[91]:
 
 
 medical.head()
 medical.to_csv('medical.csv', index=False)
 
 
-# In[ ]:
+# In[92]:
 
 
 df_cm = medical.corr(method='pearson', min_periods=1)
 df_cm = df_cm.drop(['id'])
 sns.set(font_scale=1.4) # for label size
-sns.heatmap(df_cm, annot=True, annot_kws={"size": 16},fmt='g') # font size
+sns.heatmap(df_cm, annot=True, annot_kws={"size": 12},fmt='g') # font size
 # plt.figure(figsize=(80, 80))
 plt.title("Correlation Matrix")
 plt.rcParams["figure.figsize"] = (20,10)
 
-plt.savefig('test2png.png', dpi=100)
 plt.show()
 
 
-# In[ ]:
+# In[94]:
 
 
 from scipy.stats.stats import pearsonr
 
 target_col_name = 'stroke'
 feature_target_corr = {}
+feature_target_corrp = {}
+
 for col in df_cm:
     if target_col_name != col:
-        feature_target_corr[col + '_' + target_col_name] =             pearsonr(df_cm[col], df_cm[target_col_name])
+        feature_target_corr[col] =             pearsonr(df_cm[col], df_cm[target_col_name])[0]
+        feature_target_corrp[col + '_' + target_col_name] =             pearsonr(df_cm[col], df_cm[target_col_name])
 print("Feature-Target Correlations")
+# correlation coefficient
 print(feature_target_corr)
+# pvalue
+print(feature_target_corrp)
+print(type(feature_target_corr))
 
 
-# In[ ]:
+# In[96]:
+
+
+myList = feature_target_corr.items()
+myList = sorted(myList) 
+x, y = zip(*myList) 
+plt.xticks(rotation='vertical')
+plt.title("Correlation Coefficient to Stroke Event")
+plt.ylabel("Correlation Coefficient")
+plt.xlabel("Independent Field")
+
+plt.plot(x, y)
+plt.show()
+
+
+# In[97]:
 
 
 sc = StandardScaler()
@@ -85,7 +106,7 @@ x = scaledData
 y = medical['stroke']
 
 
-# In[ ]:
+# In[98]:
 
 
 df =pd.DataFrame(medical.drop(['id', 'gender', 'ever_married', 'heart_disease', 'Residence_type' ,'hypertension'],axis=1))
@@ -93,7 +114,7 @@ df =pd.DataFrame(medical.drop(['id', 'gender', 'ever_married', 'heart_disease', 
 sns.pairplot(df, hue="stroke")
 
 
-# In[ ]:
+# In[99]:
 
 
 df =pd.DataFrame(medical.drop(['id', 'avg_glucose_level', 'bmi', 'age'],axis=1))
@@ -101,7 +122,7 @@ df =pd.DataFrame(medical.drop(['id', 'avg_glucose_level', 'bmi', 'age'],axis=1))
 sns.pairplot(df, hue="stroke")
 
 
-# In[ ]:
+# In[100]:
 
 
 medical.columns
@@ -111,13 +132,13 @@ medical['heart_disease'].hist(by=medical['stroke'])
 # medical['stroke'].hist(by=medical['Residence_type'])
 
 
-# In[ ]:
+# In[101]:
 
 
 xtrain,xtest,ytrain,ytest = train_test_split(x,y,test_size = .20 ,random_state=32)
 
 
-# In[ ]:
+# In[102]:
 
 
 # print (ytrain)
@@ -127,7 +148,7 @@ xtrain,xtest,ytrain,ytest = train_test_split(x,y,test_size = .20 ,random_state=3
 # ytrain.fillna(0)
 
 
-# In[ ]:
+# In[103]:
 
 
 
@@ -157,7 +178,7 @@ print('confusion_matrix \n',confusion_matrix(ytest,ypred))
 print('classification_report \n',classification_report(ytest,ypred))
 
 
-# In[ ]:
+# In[104]:
 
 
 
@@ -185,7 +206,7 @@ print('classification_report \n',classification_report(ytest,ypred))
 
 
 
-# In[ ]:
+# In[105]:
 
 
 from sklearn.linear_model import LogisticRegression
@@ -214,7 +235,7 @@ print('confusion_matrix \n',confusion_matrix(ytest,ypred))
 print('classification_report \n',classification_report(ytest,ypred))
 
 
-# In[ ]:
+# In[106]:
 
 
 #Packages used for Support Vectors
@@ -244,7 +265,7 @@ print('confusion_matrix \n',confusion_matrix(ytest,ypred))
 print('classification_report \n',classification_report(ytest,ypred))
 
 
-# In[ ]:
+# In[107]:
 
 
 #Package used for Kmeans learning
