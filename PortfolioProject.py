@@ -1,5 +1,10 @@
 #!/usr/bin/env python
-# coding: utf-8\nimport pandas as pd
+# coding: utf-8
+
+# In[ ]:
+
+
+import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -11,17 +16,37 @@ from sklearn.metrics import confusion_matrix,accuracy_score,classification_repor
 # medical = pd.read_csv('../documents/KaggleV2-May-2016.csv',parse_dates=['ScheduledDay','AppointmentDay'])
 # File needs to be in the same root folder
 medical = pd.read_csv('healthcare-dataset-stroke-data.csv')
-medical.head()\n
+medical.head()
+
+
+# In[ ]:
+
+
 # medical['ever_married'].value_counts()
-medical['ever_married'] = medical['ever_married'].map({'Yes':1,'No':0})\n
+medical['ever_married'] = medical['ever_married'].map({'Yes':1,'No':0})
+
+
+# In[ ]:
+
+
 le = LabelEncoder()
 medical['gender'] = le.fit_transform(medical['gender'])
 medical['work_type'] = le.fit_transform(medical['work_type'])
 medical['Residence_type'] = le.fit_transform(medical['Residence_type'])
 medical['smoking_status'] = le.fit_transform(medical['smoking_status'])
-medical.fillna(0)\n
+medical.fillna(0)
+
+
+# In[ ]:
+
+
 medical.head()
-medical.to_csv('medical.csv', index=False)\n
+medical.to_csv('medical.csv', index=False)
+
+
+# In[ ]:
+
+
 df_cm = medical.corr(method='pearson', min_periods=1)
 df_cm = df_cm.drop(['id'])
 sns.set(font_scale=1.4) # for label size
@@ -31,31 +56,80 @@ plt.title("Correlation Matrix")
 plt.rcParams["figure.figsize"] = (20,10)
 
 plt.savefig('test2png.png', dpi=100)
-plt.show()\n
+plt.show()
+
+
+# In[ ]:
+
+
+from scipy.stats.stats import pearsonr
+
+target_col_name = 'stroke'
+feature_target_corr = {}
+for col in df_cm:
+    if target_col_name != col:
+        feature_target_corr[col + '_' + target_col_name] =             pearsonr(df_cm[col], df_cm[target_col_name])
+print("Feature-Target Correlations")
+print(feature_target_corr)
+
+
+# In[ ]:
+
+
 sc = StandardScaler()
 medical =medical[~medical.isin([np.nan, np.inf, -np.inf]).any(1)]
 
 scaledData = pd.DataFrame(sc.fit_transform(medical.drop(['id', 'stroke'],axis=1)),columns=medical.drop(['id', 'stroke'],axis=1).columns)
 
 x = scaledData
-y = medical['stroke']\n
+y = medical['stroke']
+
+
+# In[ ]:
+
+
 df =pd.DataFrame(medical.drop(['id', 'gender', 'ever_married', 'heart_disease', 'Residence_type' ,'hypertension'],axis=1))
 # medical.columns
-sns.pairplot(df, hue="stroke")\n
+sns.pairplot(df, hue="stroke")
+
+
+# In[ ]:
+
+
 df =pd.DataFrame(medical.drop(['id', 'avg_glucose_level', 'bmi', 'age'],axis=1))
 # medical.columns
-sns.pairplot(df, hue="stroke")\n
+sns.pairplot(df, hue="stroke")
+
+
+# In[ ]:
+
+
 medical.columns
 medical['hypertension'].hist(by=medical['stroke'])
 medical['heart_disease'].hist(by=medical['stroke'])
 
-# medical['stroke'].hist(by=medical['Residence_type'])\n
-xtrain,xtest,ytrain,ytest = train_test_split(x,y,test_size = .20 ,random_state=32)\n
+# medical['stroke'].hist(by=medical['Residence_type'])
+
+
+# In[ ]:
+
+
+xtrain,xtest,ytrain,ytest = train_test_split(x,y,test_size = .20 ,random_state=32)
+
+
+# In[ ]:
+
+
 # print (ytrain)
 # print(type(xtrain))
 # ytrain.isna()
 # xtrain.fillna(0)
-# ytrain.fillna(0)\n
+# ytrain.fillna(0)
+
+
+# In[ ]:
+
+
 
 #Packages used for random and decision trees
 from sklearn.tree import DecisionTreeClassifier
@@ -80,7 +154,12 @@ plt.show()
 print('\n***','Random Forest','*** \n')
 print('accuracy_score \n',accuracy_score(ytest,ypred))
 print('confusion_matrix \n',confusion_matrix(ytest,ypred))
-print('classification_report \n',classification_report(ytest,ypred))\n
+print('classification_report \n',classification_report(ytest,ypred))
+
+
+# In[ ]:
+
+
 
 #Calling the decision tree function from SciKit and fitting our datasets into the model
 model = DecisionTreeClassifier()
@@ -102,7 +181,12 @@ plt.show()
 print('\n***','Decision Tree','*** \n')
 print('accuracy_score \n',accuracy_score(ytest,ypred))
 print('confusion_matrix \n',confusion_matrix(ytest,ypred))
-print('classification_report \n',classification_report(ytest,ypred))\n
+print('classification_report \n',classification_report(ytest,ypred))
+
+
+
+# In[ ]:
+
 
 from sklearn.linear_model import LogisticRegression
 
@@ -127,7 +211,12 @@ plt.show()
 print('\n***','Logistic Regression','*** \n')
 print('accuracy_score \n',accuracy_score(ytest,ypred))
 print('confusion_matrix \n',confusion_matrix(ytest,ypred))
-print('classification_report \n',classification_report(ytest,ypred))\n
+print('classification_report \n',classification_report(ytest,ypred))
+
+
+# In[ ]:
+
+
 #Packages used for Support Vectors
 from sklearn import svm
 
@@ -152,7 +241,12 @@ plt.show()
 print('\n***','Support Vector Machine Learning','*** \n')
 print('accuracy_score \n',accuracy_score(ytest,ypred))
 print('confusion_matrix \n',confusion_matrix(ytest,ypred))
-print('classification_report \n',classification_report(ytest,ypred))\n
+print('classification_report \n',classification_report(ytest,ypred))
+
+
+# In[ ]:
+
+
 #Package used for Kmeans learning
 from sklearn.cluster import KMeans
 
@@ -164,7 +258,7 @@ kmeans = KMeans(n_clusters=2, random_state=0).fit(df)
 labels = kmeans.labels_
 
 #kMean labels are added to our dataframe
-# df['clusters'] = labels
+df['clusters'] = labels
 
 
 #Scatter plot of only clusters Age Vs No-Show using seaborn packages
